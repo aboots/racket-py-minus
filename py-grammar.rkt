@@ -223,10 +223,10 @@
 ;31. Expressions → Expressions ‘, ‘ Expression | Expression
 (define expressions? (lambda (e) (and (not (null? e)) (list-of expression?))))
 
-;32. Print → ‘print (‘ Atom ‘)‘ | ‘print (‘ Atoms ‘)‘
-;where Atoms → Atom | Atoms‘,‘ Atom
+;32. Print → ‘print (‘ Items ‘)‘
 (define-datatype print print?
-  (print-atom
-   (atom atom?))
-  (print-atoms
-   (atoms (list-of atom?))))
+  (print-exp
+   (items items?)))
+
+;33. Items → Atom | Items‘,‘ Atom
+(define items? (lambda (e) (or (atom? e) (list-of atom?))))

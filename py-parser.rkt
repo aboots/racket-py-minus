@@ -26,8 +26,8 @@
      ((global-stmt) (global-simple-stmt $1))
      ((return-stmt) (return-simple-stmt $1))
      ((PASS) (pass-stmt))
-     ((BREAK) (break-stmt)))
-     ((CONTINUE) (continue-stmt))
+     ((BREAK) (break-stmt))
+     ((CONTINUE) (continue-stmt)))
     (compound-stmt
      ((function-def) (func-def-comp-stmt $1))
      ((if-stmt) (if-comp-stmt $1))
@@ -112,10 +112,9 @@
      ((expressions COMMA expression) (append $1 (list $3)))
      ((expression) (list $1)))
     (print
-     ((PRINT OPEN-PAR atom CLOSE-PAR) (print-atom $3))
-     ((PRINT OPEN-PAR atoms CLOSE-PAR) (print-atoms $3)))
-    (atoms
-     ((atom COMMA atom) (list $1 $3))
-     ((atoms COMMA atom) (append $1 (list $3)))))))
+     ((PRINT OPEN-PAR items CLOSE-PAR) (print-exp $3)))
+    (items
+     ((atom) $1)
+     ((items COMMA atom) (cons $1 (list $3)))))))
 
 (define (lex-and-parse input) (a-program (py-parser (lex input))))
