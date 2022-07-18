@@ -114,7 +114,7 @@
     (print
      ((PRINT OPEN-PAR items CLOSE-PAR) (print-exp $3)))
     (items
-     ((atom) (list $1))
-     ((items COMMA atom) (append $1 (list $3)))))))
+     ((atom) $1)
+     ((items COMMA atom) (cons $1 (list $3)))))))
 
 (define (lex-and-parse input) (a-program (py-parser (lex input))))
