@@ -2,8 +2,6 @@
 (require parser-tools/lex
          (prefix-in : parser-tools/lex-sre))
 
-(provide (all-defined-out))
-
 ;scanner
 (define scanner
   (lexer
@@ -57,8 +55,8 @@
    ((eof) (token-EOF))))
 
 ;tokens
-(define-tokens token-type-a (NUM ID))
-(define-empty-tokens token-type-b (SEMICOL PASS BREAK CONTINUE ASSIGN RETURN
+(define-tokens a (NUM ID))
+(define-empty-tokens b (SEMICOL PASS BREAK CONTINUE ASSIGN RETURN
                                 GLOBAL DEF OPEN-PAR CLOSE-PAR COLON
                                 COMMA IF ELSE FOR IN OR AND NOT EQUAL
                                 LESS GREATER PLUS MINUS MUL POW DIV
