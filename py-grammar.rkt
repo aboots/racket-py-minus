@@ -50,7 +50,7 @@
 ;6. Assignment → ID ‘ = ‘ Expression
 (define-datatype assignment assignment?
   (an-assignment
-   (ID symbol?)
+   (ID-lhs assignment-lhs?)
    (exp expression?)))
 
 ;7. Return_stmt → ‘return‘ | ‘return‘ Expression
@@ -69,9 +69,11 @@
   (params-func-def
    (ID symbol?)
    (params params?)
+   (return-type return-type?)
    (statements statements?))
   (zero-param-func-def
    (ID symbol?)
+   (return-type return-type?)
    (statements statements?)))
 
 ;10. Params → Param_with_default | Params ‘, ‘ Param_with_default
@@ -80,7 +82,7 @@
 ;11. Param_with_default → ID ‘ = ‘ Expression
 (define-datatype param-with-default param-with-default?
   (a-param-with-default
-   (ID symbol?)
+   (ID-lhs assignment-lhs?)
    (exp expression?)))
 
 ;12. If_stmt → ‘if‘ Expression ‘ : ‘ Statements Else_block
@@ -230,3 +232,26 @@
 
 ;33. Items → Atom | Items‘,‘ Atom
 (define items? (lambda (e) (or (atom? e) (list-of atom?))))
+
+;34. Type → var | 'int' | 'float' | 'bool' | 'list' | 'none'
+(define-datatype type type?
+  (int-type)
+  (float-type)
+  (bool-type)
+  (list-type)
+  (none-type))
+
+;35. assignment-lhs → ID | ID ':' type
+(define-datatype assignment-lhs assignment-lhs?
+  (assign-without-type
+   (ID symbol?))
+  (assign-with-type
+   (ID symbol?)
+   (ty type?)))
+
+;36. return type → ':' | '->' Type ':'
+(define-datatype return-type return-type?
+  (return-no-type)
+  (return-type-func
+   (ty type?)))
+   
