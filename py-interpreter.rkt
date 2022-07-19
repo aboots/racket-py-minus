@@ -52,8 +52,9 @@
 (define value-of-assignment
   (lambda (as scope)
     (cases assignment as
-      (an-assignment (ID exp)
-                     (an-answer (a-none) '- (extend-scope scope ID (a-thunk exp (copy-of-scope scope))))))))
+      (an-assignment (ID-lhs exp)
+                     (let ((ID (value-of-assignment-lhs ID-lhs scope)))
+                             (an-answer (a-none) '- (extend-scope scope ID (a-thunk exp (copy-of-scope scope)))))))))
 
 (define value-of-return-stmt
         (lambda (return-st scope)
@@ -79,10 +80,10 @@
 (define value-of-function-def
   (lambda (func-def scope)
     (cases function-def func-def
-      (params-func-def (ID params sts)
+      (params-func-def (ID params return-type sts)
                            (let ((new-func (a-function ID params sts (new-local-scope scope))))
                              (an-answer (a-none) '- (extend-scope scope ID new-func))))
-      (zero-param-func-def (ID sts)
+      (zero-param-func-def (ID return-type sts)
                            (let ((new-func (a-function ID (list) sts (new-local-scope scope))))
                              (an-answer (a-none) '- (extend-scope scope ID new-func)))))))
 
@@ -325,8 +326,9 @@
 (define value-of-param-with-default
   (lambda (pwd scope)
     (cases param-with-default pwd
-      (a-param-with-default (ID exp)
-                            (let ((exp-val (answer-val (value-of-expression exp scope))))
+      (a-param-with-default (ID-lhs exp)
+                            (let ((exp-val (answer-val (value-of-expression exp scope)))
+                                  (ID (value-of-assignment-lhs ID-lhs scope)))
                               (an-answer exp-val '- (extend-scope scope ID exp-val)))))))
 
 (define value-of-print
@@ -397,12 +399,14 @@
     (if (null? arg-list)
         scope
         (cases param-with-default (car params)
-          (a-param-with-default (ID exp)
-                                (add-args-to-scope
+          (a-param-with-default (ID-lhs exp)
+                                (let ((ID (value-of-assignment-lhs ID-lhs scope)))
+                              (add-args-to-scope
                                  (cdr arg-list)
                                  (cdr params)
                                  (extend-scope scope ID (a-thunk (car arg-list) thunk-scope))
-                                 thunk-scope))))))
+                                 thunk-scope))
+                                )))))
 
 (define add-params-to-scope
   (lambda (params scope)
@@ -479,3 +483,9 @@
   (lambda (e-l)
     (cases eval-list e-l
       (an-eval-list (p-l sc) sc))))    
+
+(define value-of-assignment-lhs
+  (lambda (ID-lhs scope)
+    (cases assignment-lhs ID-lhs
+      (assign-without-type (ID) ID)
+      (assign-with-type (ID ty) ID))))
