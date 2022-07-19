@@ -14,6 +14,9 @@
    (error void)
    (tokens token-type-a token-type-b)
    (grammar
+    (program
+     ((statements) (a-program $1))
+     ((CHECKED statements) (checked-program $2)))
     (statements
      ((statement SEMICOL) (single-statements $1))
      ((statements statement SEMICOL) (mult-statements $1 $2)))
@@ -33,20 +36,20 @@
      ((if-stmt) (if-comp-stmt $1))
      ((for-stmt) (for-comp-stmt $1)))
     (assignment
-     ((ID ASSIGN expression) (an-assignment $1 $3)))
+     ((assignment-lhs ASSIGN expression) (an-assignment $1 $3)))
     (return-stmt
      ((RETURN) (empty-return-stmt))
      ((RETURN expression) (exp-return-stmt $2)))
     (global-stmt
      ((GLOBAL ID) (a-global-stmt $2)))
     (function-def
-     ((DEF ID OPEN-PAR params CLOSE-PAR COLON statements) (params-func-def $2 $4 $7))
-     ((DEF ID ZERO-ARG COLON statements) (zero-param-func-def $2 $5)))
+     ((DEF ID OPEN-PAR params CLOSE-PAR return-type statements) (params-func-def $2 $4 $6 $7))
+     ((DEF ID ZERO-ARG return-type statements) (zero-param-func-def $2 $4 $5)))
     (params
      ((param-with-default) (list $1))
      ((params COMMA param-with-default) (append $1 (list $3))))
     (param-with-default
-     ((ID ASSIGN expression) (a-param-with-default $1 $3)))
+     ((assignment-lhs ASSIGN expression) (a-param-with-default $1 $3)))
     (if-stmt
      ((IF expression COLON statements else-block) (an-if-stmt $2 $4 $5)))
     (else-block
@@ -115,6 +118,18 @@
      ((PRINT OPEN-PAR items CLOSE-PAR) (print-exp $3)))
     (items
      ((atom) (list $1))
-     ((items COMMA atom) (append $1 (list $3)))))))
+     ((items COMMA atom) (append $1 (list $3))))
+    (type
+     ((INT) (int-type))
+     ((FLOAT) (float-type))
+     ((BOOL) (bool-type))
+     ((LIST) (list-type))
+     ((NONE) (none-type)))
+    (assignment-lhs
+     ((ID) (assign-without-type $1))
+     ((ID COLON type) (assign-with-type $1 $3)))
+    (return-type
+     ((COLON) (return-no-type))
+     ((RETURNSYMBOL type COLON) (return-type-func $2))))))
 
 (define (lex-and-parse input) (a-program (py-parser (lex input))))
