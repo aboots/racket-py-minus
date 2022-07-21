@@ -14,5 +14,3 @@
                                     (lex-and-parse
                                       (apply string-append
                                              (file->lines file-input-addr)))))
-
-;(evaluate "tests/in4.txt")

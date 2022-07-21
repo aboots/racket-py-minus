@@ -11,12 +11,12 @@
 (define value-of
   (lambda (pgm)
     (cases program pgm
-      (a-program (statements)(begin
-                 (value-of-statements statements (new-global-scope))
-                 (display "")))
+      (a-program (statements) (begin
+                                (value-of-statements statements (new-global-scope))
+                                (displayln "program terminated")))
       (checked-program (ch statements) (begin
                                          (value-of-statements statements (new-global-scope))
-                                         (display ""))))))
+                                         (displayln "program terminated"))))))
 
 (define value-of-statements
   (lambda (sts scope)
