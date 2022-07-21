@@ -8,6 +8,7 @@
 
 (provide (all-defined-out))
 
+;Value of  -----------------------------------------------------------------------
 (define value-of
   (lambda (pgm)
     (cases program pgm
@@ -32,12 +33,9 @@
 (define value-of-statement
   (lambda (st scope)
     (cases statement st
-      (a-compound-stmt (st)
-       (value-of-compound-stmt st scope))
-      (a-simple-stmt (st)
-       (value-of-simple-stmt st scope))
-      (a-print-stmt (st)
-                    (value-of-print st scope)))))
+      (a-compound-stmt (st) (value-of-compound-stmt st scope))
+      (a-simple-stmt (st) (value-of-simple-stmt st scope))
+      (a-print-stmt (st) (value-of-print st scope)))))
 
 (define value-of-simple-stmt
   (lambda (st scope)
@@ -163,13 +161,16 @@
                          (value-of-sum sum scope))
       (eq-sum-comparison (eq-sum)
                          (let ((cmp-ans (value-of-eq-sum eq-sum scope)))
-                           (an-answer (cmp-res cmp-ans) '- (cmp-scope cmp-ans))))
+                           (cases cmp-answer cmp-ans
+                             (a-cmp-answer (res sc) (an-answer res '- sc)))))
       (lt-sum-comparison (lt-sum)
                          (let ((cmp-ans (value-of-lt-sum lt-sum scope)))
-                           (an-answer (cmp-res cmp-ans) '- (cmp-scope cmp-ans))))
+                           (cases cmp-answer cmp-ans
+                             (a-cmp-answer (res sc) (an-answer res '- sc)))))
       (gt-sum-comparison (gt-sum)
                          (let ((cmp-ans (value-of-gt-sum gt-sum scope)))
-                           (an-answer (cmp-res cmp-ans) '- (cmp-scope cmp-ans)))))))
+                           (cases cmp-answer cmp-ans
+                             (a-cmp-answer (res sc) (an-answer res '- sc))))))))
 
 (define value-of-eq-sum
   (lambda (eq-s scope)
@@ -341,30 +342,6 @@
       ((and (list? at) (null? (cdr at))) (car at))
       (else at))))
 
-
-;end of interpreter ----------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-;-----------------------------------------------------------------------------------------
-
-
-;function datatype -----------------------------------------------------------------------
-(define-datatype function function?
-  (a-function
-   (ID symbol?)
-   (params (lambda (p) (or (null? p) (params? p))))
-   (statements statements?)
-   (scope scope?)))
-
 (define apply-function
   (lambda (func arg-list outer-scope)
     (cases function func
@@ -375,82 +352,9 @@
                         (let ((scope (add-args-to-scope arg-list params scope thunk-scope)))
                           (value-of-statements statements scope)))))))))
 
-(define add-args-to-scope
-  (lambda (arg-list params scope thunk-scope)
-    (if (null? arg-list)
-        scope
-        (cases param-with-default (car params)
-          (a-param-with-default (ID-lhs exp)
-                                (let ((ID (value-of-assignment-lhs ID-lhs scope)))
-                              (add-args-to-scope
-                                 (cdr arg-list)
-                                 (cdr params)
-                                 (extend-scope scope ID (a-thunk (car arg-list) thunk-scope))
-                                 thunk-scope))
-                                )))))
-
 (define add-params-to-scope
   (lambda (params scope)
     (if (null? params)
         scope
         (let ((ans (value-of-param-with-default (car params) scope)))
           (add-params-to-scope (cdr params) (answer-scope ans))))))
-
-;expval datatype ----------------------------------------------------------------------------
-(define expval?
-  (lambda (e) (or (number? e) (boolean? e) (none? e) (function? e) (eval-list? e))))
-
-;answer datatype -----------------------------------------------------------------------------
-(define-datatype answer answer?
-  (an-answer
-   (value expval?)
-   (message symbol?)
-   (scope scope?)))
-
-(define answer-val
-  (lambda (ans)
-    (cases answer ans
-      (an-answer (val msg sc) val))))
-
-(define answer-scope
-  (lambda (ans)
-    (cases answer ans
-      (an-answer (val msg sc) sc))))
-
-(define return-message?
-  (lambda (ans)
-    (cases answer ans
-      (an-answer (val msg sc) (eqv? msg 'return)))))
-
-(define continue-message?
-  (lambda (ans)
-    (cases answer ans
-      (an-answer (val msg sc) (eqv? msg 'continue)))))
-
-(define break-message?
-  (lambda (ans)
-    (cases answer ans
-      (an-answer (val msg sc) (eqv? msg 'break)))))
-
-
-;comparison answer ---------------------------------------------------------------
-(define-datatype cmp-answer cmp-answer?
-  (a-cmp-answer
-   (result boolean?)
-   (scope scope?)))
-
-(define cmp-res
-  (lambda (cmp-ans)
-    (cases cmp-answer cmp-ans
-      (a-cmp-answer (res sc) res))))
-
-(define cmp-scope
-  (lambda (cmp-ans)
-    (cases cmp-answer cmp-ans
-      (a-cmp-answer (res sc) sc))))    
-
-(define value-of-assignment-lhs
-  (lambda (ID-lhs scope)
-    (cases assignment-lhs ID-lhs
-      (assign-without-type (ID) ID)
-      (assign-with-type (ID ty) ID))))
