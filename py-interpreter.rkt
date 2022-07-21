@@ -177,26 +177,7 @@
       (an-eq-sum (sum1 sum2)
                  (let ((ans1 (value-of-sum sum1 scope))
                        (ans2 (value-of-sum sum2 scope)))
-                   (a-cmp-answer(= (answer-val ans1) (answer-val ans2)) (answer-val ans2) (answer-scope ans2)))))))
-
-(define cmp-list
-  (lambda (eval-list1 eval-list2 scope)
-    (let ((p-list1 (eval-list->py-list eval-list1))
-          (p-list2 (eval-list->py-list eval-list2))
-          (sc1 (eval-list->sc eval-list1))
-          (sc2 (eval-list->sc eval-list2)))
-        (cond
-          ((and (null? p-list1) (null? p-list2)) #t)
-          ((and (null? p-list1) (not (null? p-list2))) #f)
-          ((and (null? p-list2) (not (null? p-list1))) #f)
-          (#t
-           (let ((left-hand-exp (answer-val (value-of-expression (car p-list1) sc1)))
-                 (right-hand-exp (answer-val (value-of-expression (car p-list2) sc2))))
-             (if (not (cmp-res (value-of-eq-sum left-hand-exp right-hand-exp scope)))
-                 #f
-                 (cmp-list (an-eval-list (cdr p-list1) sc1)
-                           (an-eval-list (cdr p-list2) sc2)
-                           scope))))))))
+                   (a-cmp-answer(= (answer-val ans1) (answer-val ans2)) (answer-scope ans2)))))))
           
 (define value-of-lt-sum
   (lambda (lt-s scope)
@@ -204,7 +185,7 @@
       (an-lt-sum (sum1 sum2)
                  (let ((ans1 (value-of-sum sum1 scope))
                        (ans2 (value-of-sum sum2 scope)))
-                   (a-cmp-answer(< (answer-val ans1) (answer-val ans2)) (answer-val ans2) (answer-scope ans2)))))))
+                   (a-cmp-answer(< (answer-val ans1) (answer-val ans2)) (answer-scope ans2)))))))
 
 (define value-of-gt-sum
   (lambda (gt-s scope)
@@ -212,7 +193,7 @@
       (a-gt-sum (sum1 sum2)
                 (let ((ans1 (value-of-sum sum1 scope))
                       (ans2 (value-of-sum sum2 scope)))
-                  (a-cmp-answer (> (answer-val ans1) (answer-val ans2)) (answer-val ans2) (answer-scope ans2)))))))
+                  (a-cmp-answer (> (answer-val ans1) (answer-val ans2)) (answer-scope ans2)))))))
 
 (define value-of-sum
   (lambda (s scope)
@@ -456,33 +437,17 @@
 (define-datatype cmp-answer cmp-answer?
   (a-cmp-answer
    (result boolean?)
-   (right-hand-operand (lambda (e) (or (atom? e) (eval-list? e))))
    (scope scope?)))
 
 (define cmp-res
   (lambda (cmp-ans)
     (cases cmp-answer cmp-ans
-      (a-cmp-answer (res rh sc) res))))
-
-(define cmp-right-hand-operand
-  (lambda (cmp-ans)
-    (cases cmp-answer cmp-ans
-        (a-cmp-answer (res rh sc) rh))))
+      (a-cmp-answer (res sc) res))))
 
 (define cmp-scope
   (lambda (cmp-ans)
     (cases cmp-answer cmp-ans
-      (a-cmp-answer (res rh sc) sc))))
-
-(define eval-list->py-list
-  (lambda (e-l)
-    (cases eval-list e-l
-      (an-eval-list (p-l sc) p-l))))
-
-(define eval-list->sc
-  (lambda (e-l)
-    (cases eval-list e-l
-      (an-eval-list (p-l sc) sc))))    
+      (a-cmp-answer (res sc) sc))))    
 
 (define value-of-assignment-lhs
   (lambda (ID-lhs scope)
