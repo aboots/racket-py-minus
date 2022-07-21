@@ -12,8 +12,8 @@
   (lambda (pgm)
     (cases program pgm
       (a-program (statements)(begin
-                 (value-of-statements statements (new-global-scope))
-                 (display "")))
+                               (value-of-statements statements (new-global-scope))
+                               (display "")))
       (checked-program (ch statements) (begin
                                          (value-of-statements statements (new-global-scope))
                                          (display ""))))))
@@ -177,7 +177,7 @@
       (an-eq-sum (sum1 sum2)
                  (let ((ans1 (value-of-sum sum1 scope))
                        (ans2 (value-of-sum sum2 scope)))
-                   (a-cmp-answer(< (answer-val ans1) (answer-val ans2)) (answer-val ans2) (answer-scope ans2)))))))
+                   (a-cmp-answer(= (answer-val ans1) (answer-val ans2)) (answer-val ans2) (answer-scope ans2)))))))
 
 (define cmp-list
   (lambda (eval-list1 eval-list2 scope)

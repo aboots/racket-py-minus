@@ -133,5 +133,3 @@
      ((RETURNSYMBOL type COLON) (return-type-func $2))))))
 
 (define (lex-and-parse input) (a-program (py-parser (lex input))))
-
-;(lex-and-parse "c = 1 < 7 and 13 > 17 or 1 == 1;")
