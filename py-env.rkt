@@ -3,8 +3,7 @@
 (require eopl)
 (provide (all-defined-out))
 
-;environment datatype
-;environment is a list of pairs of variable names and their bound value
+;environment datatype ------------------------------------------------------------------------------
 (define environment? (list-of pair?))
 
 (define empty-env (lambda () (list)))
@@ -23,19 +22,17 @@
 (define globe (empty-env))
 
 ;scope datatype ------------------------------------------------------------------------------
-;we are either in the global scope or somewhere in the scope of a function
 (define-datatype scope scope?
   (global-scope)
   (local-scope
-    (global-var-list (list-of symbol?)) ;list of variables defined as 'global'
-    (env environment?))) ;local env of the function
+    (global-var-list (list-of symbol?))
+    (env environment?)))
 
 (define new-global-scope (lambda () (global-scope)))
 (define new-local-scope (lambda (sc) (cases scope sc
                                        (global-scope () (local-scope (list) (empty-env)))
                                        (local-scope (gvl env) (local-scope (list) env)))))
 
-;gets the proper local or global value for a variable
 (define apply-scope
   (lambda (sc var)
     (cases scope sc
@@ -46,7 +43,6 @@
           ((assoc var env) (apply-env env var))
           (else (eopl:error 'apply-scope "no value bounded for variable ~s" var)))))))
 
-;extends either the local env or the globe env based on wether it is 'global', in the global scope or not
 (define extend-scope
   (lambda (sc var val)
     (cases scope sc

@@ -206,7 +206,6 @@
                          (exp-val2 (answer-val ans2))
                          (scope (answer-scope ans2)))
                      (cond
-                       ((boolean? exp-val1) (an-answer (or exp-val1 exp-val2) '- scope))
                        ((eval-list? exp-val1)
                         (cases eval-list exp-val1
                           (an-eval-list (py-list1 sc1)
@@ -231,15 +230,10 @@
                (let ((ans1 (value-of-term term scope)))
                  (let ((exp-val1 (answer-val ans1))
                        (scope (answer-scope ans1)))
-                   (if (boolean? exp-val1)
-                       (if (not exp-val1)
-                           (an-answer #f '- scope)
-                           (let ((ans2 (value-of-factor factor scope)))
-                             (an-answer (and exp-val1 (answer-val ans2)) '- (answer-scope ans2))))
-                       (if (zero? exp-val1)
+                        (if (zero? exp-val1)
                            (an-answer 0 '- scope)
                            (let ((ans2 (value-of-factor factor scope)))
-                             (an-answer (* exp-val1 (answer-val ans2)) '- (answer-scope ans2))))))))
+                             (an-answer (* exp-val1 (answer-val ans2)) '- (answer-scope ans2)))))))
       (div-term (term factor)
                (let ((ans1 (value-of-term term scope)))
                  (let ((ans2 (value-of-factor factor (answer-scope ans1))))
@@ -285,7 +279,7 @@
                             (an-answer (answer-val (apply-function (answer-val ans) '() (answer-scope ans))) '- (answer-scope ans))))
       (args-func-call (primary args)
                           (let ((ans (value-of-primary primary scope)))
-                            (an-answer (answer-val (apply-function (answer-val ans) args scope)) '- (answer-scope ans)))))))
+                            (an-answer (answer-val (apply-function (answer-val ans) args (answer-scope ans))) '- (answer-scope ans))))))) ;check scope
 
 (define value-of-atom
   (lambda (atom scope)

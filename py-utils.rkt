@@ -64,7 +64,7 @@
       (an-answer (val msg sc) (eqv? msg 'break)))))
 
 
-;comparison answer ---------------------------------------------------------------
+;comparison answer datatype ---------------------------------------------------------------
 (define-datatype cmp-answer cmp-answer?
   (a-cmp-answer
    (result boolean?)
