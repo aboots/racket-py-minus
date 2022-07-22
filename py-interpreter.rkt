@@ -279,7 +279,7 @@
                             (an-answer (answer-val (apply-function (answer-val ans) '() (answer-scope ans))) '- (answer-scope ans))))
       (args-func-call (primary args)
                           (let ((ans (value-of-primary primary scope)))
-                            (an-answer (answer-val (apply-function (answer-val ans) args (answer-scope ans))) '- (answer-scope ans))))))) ;check scope
+                            (an-answer (answer-val (apply-function (answer-val ans) args (answer-scope ans))) '- (answer-scope ans)))))))
 
 (define value-of-atom
   (lambda (atom scope)
