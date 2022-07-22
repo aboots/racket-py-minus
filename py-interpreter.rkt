@@ -8,7 +8,7 @@
 
 (provide (all-defined-out))
 
-;Value of  -----------------------------------------------------------------------
+;value-of  -----------------------------------------------------------------------
 (define value-of
   (lambda (pgm)
     (cases program pgm
@@ -282,7 +282,7 @@
                                        (an-answer (answer-val (value-of-expression (list-ref py-list (answer-val ans2)) sc)) '- scope))))))
       (zero-arg-func-call (primary)
                           (let ((ans (value-of-primary primary scope)))
-                            (an-answer (answer-val (apply-function (answer-val ans) (list) (answer-scope ans))) '- (answer-scope ans))))
+                            (an-answer (answer-val (apply-function (answer-val ans) '() (answer-scope ans))) '- (answer-scope ans))))
       (args-func-call (primary args)
                           (let ((ans (value-of-primary primary scope)))
                             (an-answer (answer-val (apply-function (answer-val ans) args scope)) '- (answer-scope ans)))))))

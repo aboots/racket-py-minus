@@ -1,0 +1,18 @@
+def f():
+	global a;
+	a = a + 1;
+;
+
+def g():
+	global a;
+	a = a + 2;
+;
+
+a = 2;
+print(a);
+b = f();
+print(b);
+print(a);
+c = g();
+print(c);
+print(a);

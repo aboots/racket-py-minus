@@ -64,8 +64,7 @@
   (lambda (sc var)
     (cases scope sc
       (global-scope () sc)
-      (local-scope (global-var-list env)
-                   (local-scope (cons var global-var-list) env)))))
+      (local-scope (global-var-list env) (local-scope (cons var global-var-list) env)))))
 
 (define copy-of-scope
   (lambda (sc)
