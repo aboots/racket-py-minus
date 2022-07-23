@@ -115,7 +115,7 @@
       (an-assignment (ID-lhs exp)
                      (let ([var-type (cadr (exp->assignment-lhs ID-lhs))]
                            [ID (car (exp->assignment-lhs ID-lhs))]
-                           [result-type (type-of exp scope)])
+                           [result-type (type-of-expression exp scope)])
                        (check-equal-type! var-type result-type exp)
                        (extend-scope scope ID result-type)
                        (none-type))))))
@@ -125,7 +125,7 @@
     (cases return-stmt return-st
       (empty-return-stmt () (none-type))
       (exp-return-stmt (exp)
-                       (let ((ty (type-of exp scope)))
+                       (let ((ty (type-of-print exp scope)))
                          (none-type))))))
 
 (define type-of-global-stmt
@@ -144,12 +144,14 @@
 (define type-of-func-def
   (lambda (func-def scope)
     (cases function-def func-def
-      (params-func-def (ID params param-types t-result sts)
-                       (let ([result-type (type-of body (extend-tenv* vars param-types scope))])
-                         (check-equal-type! t-result result-type sts)
-                         (proc-type param-types result-type)))
+      (params-func-def (ID params t-result sts)
+                       (let ([vars (list "must fill")]
+                             [param-types (list "must fill")])
+                         (let ([result-type (type-of-statements sts (extend-tenv* vars param-types scope))])
+                           (check-equal-type! t-result result-type sts)
+                           (proc-type param-types result-type))))
       (zero-param-func-def (ID t-result sts)
-                           (let ([result-type (type-of body)])
+                           (let ([result-type (type-of-statements sts)])
                              (check-equal-type! t-result result-type sts)
                              (proc-type (none-type) result-type))))))
 
@@ -157,8 +159,8 @@
   (lambda (if-st scope)
     (cases if-stmt if-st
       (an-if-stmt (exp sts else-block)
-                  (let ([ty1 (type-of exp scope)]
-                        [ty2 (type-of sts scope)]
+                  (let ([ty1 (type-of-expression exp scope)]
+                        [ty2 (type-of-statements sts scope)]
                         [ty3 (type-of-else-block else-block scope)])
                     (check-equal-type! ty1 (bool-type) exp)
                     (check-equal-type! ty2 ty3 exp)
@@ -168,13 +170,13 @@
   (lambda (else-bl scope)
     (cases else-block else-bl
       (an-else-block (sts)
-                     (type-of sts scope)))))
+                     (type-of-statements sts scope)))))
 
 (define type-of-for-stmt
   (lambda (for-st scope)
     (cases for-stmt for-st
       (a-for-stmt (ID exp sts)
-                  (let loop ([lst lst])
+                  (let loop ([lst sts])
                     (if (null? lst)
                         (none-type)
                         (let ([dummy (type-of-statements (extend-tenv ID (type-of-expression (car lst) scope)))]) 
@@ -314,11 +316,11 @@
     (cases factor fact
       (pos-factor (pow)
                   (let ([ty1 (type-of-power pow scope)])
-                    (check-equal-type! ty1 (int-type) exp1)
+                    (check-equal-type! ty1 (int-type) pow)
                     (int-type)))
       (neg-factor (pow)
                   (let ([ty1 (type-of-power pow scope)])
-                    (check-equal-type! ty1 (int-type) exp1)
+                    (check-equal-type! ty1 (int-type) pow)
                     (int-type)))
       (single-factor (pow)
                      (type-of-power pow scope)))))
@@ -341,8 +343,8 @@
       (an-atom (atom)
                (type-of-atom atom scope))
       (index-access (primary exp)
-                    (let ([idx-type (type-of-expression exp tenv)])
-                      (check-equal-type! idx-type (int-type) index)
+                    (let ([idx-type (type-of-expression exp scope)])
+                      (check-equal-type! idx-type (int-type) exp)
                       (none-type))) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; must be type of element of list
       (zero-arg-func-call (primary)
                           (type-of-primary primary scope))
