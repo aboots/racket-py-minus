@@ -1,11 +1,9 @@
-#lang eopl
+#lang racket
+(require eopl)
 
 (require "py-env.rkt"
          "py-grammar.rkt"
-         "py-utils.rkt"
-         "py-parser.rkt"
-         "py-interpreter.rkt"
-         "py-lexer.rkt")
+         "py-utils.rkt")
 
 (provide (all-defined-out))
 
@@ -14,6 +12,11 @@
   (extended-tenv-record (sym symbol?)
                         (type type?)
                         (tenv type-environment?)))
+
+(define-datatype procedure-type procedure-type?
+  (proc-type
+   (args-type (list-of type?))
+   (result-type type?)))
 
 (define apply-tenv
   (lambda (tenv sym)
@@ -77,7 +80,7 @@
   (lambda (pgm)
     (cases program pgm
       (a-program (statements) (none-type))
-      (checked-program (ch statements) (type-of-statements statements empty-tenv)))))
+      (checked-program (statements) (type-of-statements statements empty-tenv)))))
 
 (define type-of-statements
   (lambda (sts scope)
@@ -353,36 +356,31 @@
                             [rand-types (map (lambda (arg)
                                                (type-of-argument arg scope))
                                              args)])
-                        (cases type rator-type
+                        (if (procedure-type? rator-type)
+                         (cases procedure-type rator-type
                           [proc-type (arg-types result-type) (begin (for-each check-equal-type!
                                                                               arg-types
                                                                               rand-types
                                                                               args)
-                                                                    result-type)]
-                          [else (report-rator-not-a-proc-type rator-type primary)]))))))
+                                                                    result-type)])
+                          (report-rator-not-a-proc-type rator-type primary)))))))
 
 
 (define type-of-atom
   (lambda (atom scope)
     (cond
-      ((symbol? atom) ((apply-tenv scope var)))
+      ((symbol? atom) ((apply-tenv scope atom)))
       ((py-list? atom) (list-type))
       ((boolean? atom) (bool-type))
       ((none? atom) (none-type))
       ((integer? atom) (int-type))
-      ((float? atom) (float-type))
+      ((flonum? atom) (float-type))
       )))
 
 (define type-of-argument
   (lambda (atom scope)
     (list-type)))
 
-
-(define type-of-thunk
-  (lambda (th)
-    (cases thunk th
-      (a-thunk (exp scope)
-               (type-of exp scope)))))
 
 (define type-of-param-with-default
   (lambda (pwd scope)
@@ -393,8 +391,6 @@
 (define type-of-print
   (lambda (pr scope)
     (cases print pr
-      (print-atom (atom)
-                  (none-type))
-      (print-atoms (atoms) 
-                   (none-type)))))
+      (print-exp (items)
+                  (none-type)))))
 

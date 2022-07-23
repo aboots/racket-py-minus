@@ -4,7 +4,8 @@
 (require "py-env.rkt"
          "py-grammar.rkt"
          "py-utils.rkt"
-         "py-parser.rkt")
+         "py-parser.rkt"
+         "py-type.rkt")
 
 (provide (all-defined-out))
 
@@ -22,6 +23,7 @@
                                (value-of-statements statements (new-global-scope))
                                (display "")))
       (checked-program (statements) (begin
+                                         ;(type-of-program pgm)
                                          (value-of-statements statements (new-global-scope))
                                          (display ""))))))
 
