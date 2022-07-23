@@ -10,10 +10,10 @@
 (provide (all-defined-out))
 
 ;evaluate -----------------------------------------------------------------------
-(define (evaluate file-input-addr) (value-of
-                                    (lex-and-parse
-                                      (apply string-append
-                                             (file->lines file-input-addr)))))
+(define (evaluate file-input-addr)
+  (let ((ls (file->lines file-input-addr)))
+        (let ((final_ls (cons (car ls) (cons " " (cdr ls)))))
+     (value-of (lex-and-parse (apply string-append final_ls))))))
 
 ;(evaluate "tests/in4.txt")
 ;(evaluate "tests/in44.txt")
