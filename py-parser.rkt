@@ -9,7 +9,7 @@
 
 (define py-parser
   (parser
-   (start statements)
+   (start program)
    (end EOF)
    (error void)
    (tokens token-type-a token-type-b)
@@ -132,6 +132,6 @@
      ((COLON) (return-no-type))
      ((RETURNSYMBOL type COLON) (return-type-func $2))))))
 
-(define (lex-and-parse input) (a-program (py-parser (lex input))))
+(define (lex-and-parse input) (a-inner-program (py-parser (lex input))))
 
 ;(lex-and-parse "c = 1 < 7 and 13 > 17 or 1 == 1;")

@@ -2,19 +2,14 @@
 
 (provide (all-defined-out))
 
-;0. outer-program → Program EOF
-(define-datatype outer-program outer-program?
-  (a-inner-program
-   (program program?)))
-
-;1. Program → Statements | ‘checked‘ Statements
+;1. Program → Statements EOF
 (define-datatype program program?
-  (a-program
-   (statements statements?))
+  (a-program (statements statements?))
   (checked-program
+   (checked string?)
    (statements statements?)))
 
-;2. Statements → Statement ‘;‘ | Statements Statement ‘;‘
+;2. Statements → Statement ‘; ‘ | Statements Statement ‘; ‘
 (define-datatype statements statements?
   (single-statements
    (statement statement?))

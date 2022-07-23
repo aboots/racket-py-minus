@@ -9,13 +9,19 @@
 (provide (all-defined-out))
 
 ;value-of  -----------------------------------------------------------------------
+
 (define value-of
+  (lambda (pgm)
+    (cases outer-program pgm (a-inner-program (program) (value-of-program program)))))
+
+
+(define value-of-program
   (lambda (pgm)
     (cases program pgm
       (a-program (statements)(begin
                                (value-of-statements statements (new-global-scope))
                                (display "")))
-      (checked-program (ch statements) (begin
+      (checked-program (statements) (begin
                                          (value-of-statements statements (new-global-scope))
                                          (display ""))))))
 
