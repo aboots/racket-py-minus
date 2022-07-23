@@ -10,10 +10,10 @@
 (provide (all-defined-out))
 
 (define-datatype type-environment type-environment?
-  (empty-tenv-record)
-  (extended-tenv-record (sym symbol?)
-                        (type type?)
-                        (tenv type-environment?)))
+  [empty-tenv-record]
+  [extended-tenv-record [sym symbol?]
+                        [type type?]
+                        [tenv type-environment?]])
 
 (define apply-tenv
   (lambda (tenv sym)
@@ -43,7 +43,10 @@
       [float-type () 'float]
       [bool-type () 'bool]
       [none-type () 'none]
-      [list-type () 'list])))
+      [list-type () 'list]
+      [proc-type (arg-type result-type) (list (type-to-external-form arg-type)
+                                              '->
+                                              (type-to-external-form result-type))])))
 
 (define report-unequal-types
   (lambda (ty1 ty2 exp)
@@ -76,8 +79,8 @@
 (define type-of-program
   (lambda (pgm)
     (cases program pgm
-      (a-program (statements) (none-type))
-      (checked-program (ch statements) (type-of-statements statements empty-tenv)))))
+      (a-program (statements) (type-of statements scope))
+      (checked-program (ch statements) (type-of-statements statements scope)))))
 
 (define type-of-statements
   (lambda (sts scope)
@@ -396,3 +399,8 @@
       (print-atoms (atoms) 
                    (none-type)))))
 
+
+(define type-of-program
+  (lambda (pgm)
+    [cases program pgm
+      (a-program (exp1) (type-of exp1 (empty-tenv)))]))
